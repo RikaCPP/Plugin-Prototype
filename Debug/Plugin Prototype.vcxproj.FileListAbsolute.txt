@@ -1,0 +1,3 @@
+C:\Users\danzw\source\repos\Plugin Prototype\Debug\Plugin Prototype.exe
+C:\Users\danzw\source\repos\Plugin Prototype\Debug\Plugin Prototype.vcxproj.CopyComplete
+C:\Users\danzw\source\repos\Plugin Prototype\Debug\raylib.dll

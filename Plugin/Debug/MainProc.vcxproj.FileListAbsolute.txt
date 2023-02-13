@@ -1,0 +1,4 @@
+C:\Users\danzw\source\repos\MainProc\Debug\Plugin.exe
+C:\Users\danzw\source\repos\Plugin\Debug\Plugin.dll
+C:\Users\Richard Reinhardt\source\repos\Plugin\Plugin\Debug\Plugin.dll
+C:\Users\danzw\source\repos\Win-Raylib-DllI-loader\Plugin\Debug\Plugin.dll
