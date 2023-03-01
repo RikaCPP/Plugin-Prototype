@@ -1,6 +1,1 @@
-﻿  Main.cpp
-C:\Users\danzw\source\repos\Plugin Prototype\Main.cpp(150,138): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\danzw\source\repos\Plugin Prototype\Main.cpp(150,106): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\danzw\source\repos\Plugin Prototype\Main.cpp(150,52): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\danzw\source\repos\Plugin Prototype\Main.cpp(150,20): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  Plugin Prototype.vcxproj -> C:\Users\danzw\source\repos\Plugin Prototype\Debug\Plugin Prototype.exe
+﻿  Plugin Prototype.vcxproj -> C:\Users\danzw\source\repos\Plugin Prototype\Debug\Plugin Prototype.exe

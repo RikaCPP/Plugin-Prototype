@@ -5,7 +5,7 @@
 #include<vector>
 #include<iostream>
 
-struct sCheckArea
+struct sCheckAreaLRUD
 {
 	int MostLeftCheck = 0;
 	int MostRightCheck = 0;
@@ -15,7 +15,7 @@ struct sCheckArea
 
 struct Collider
 {
-	sCheckArea StaticArea;
+	sCheckAreaLRUD StaticArea;
 	Rectangle CollisionBoxNotStatic;
 };
 
@@ -29,10 +29,10 @@ sBlock Level[7][7] =
 {
 	{{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0}, {{255,0,0,128},0}, {{255,0,0,128},0},},
 	{{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0}, {{255,0,0,128},0}, {{255,0,0,128},0},},
+	{{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0}, {{255,0,0,128},1}, {{255,0,0,128},0},},
 	{{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0}, {{255,0,0,128},0}, {{255,0,0,128},0},},
+	{{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0}, {{255,0,0,128},2}, {{255,0,0,128},0},},
 	{{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0}, {{255,0,0,128},0}, {{255,0,0,128},0},},
-	{{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},2}, {{255,0,0,128},0}, {{255,0,0,128},0},},
-	{{{255,0,0,128},0},	{{255,0,0,128},1},	{{255,0,0,128},0},	{{255,0,0,128},1},	{{255,0,0,128},0}, {{255,0,0,128},0}, {{255,0,0,128},0},},
 	{{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0},	{{255,0,0,128},0}, {{255,0,0,128},0}, {{255,0,0,128},0},}
 };
 
@@ -42,27 +42,30 @@ public:
 	int x = 0;
 	int y = 16;
 	std::vector<Rectangle> HitBox;
-	std::vector<Collider> CollisionBox
-	{	
-		{sCheckArea{0,1,0,1},Rectangle{0,0,16,16}},
-		{sCheckArea{0,1,-1,0},Rectangle{2,-12,12,12}}
-	};
+	Collider CollisionBox {sCheckAreaLRUD{0,1,0,2},Rectangle{0,0,16,18}};
+	
+	enum class eAxis{X, Y};
 
-	bool Fourcollision(int x, int y, int &Tmp_x, int &Tmp_y, bool CalledFromFourcollision)
+	bool Fourcollision(int x, int y, int &Tmp_x, int &Tmp_y, eAxis Axis, bool CalledFromFourcollision)
 	{
 		struct sCorseXY
-		{
-			int x;
-			int y;
-		}; sCorseXY CorseXY = {x/16,y/16 };
-		bool IsFirstCollider = true;
-		for (auto &it : CollisionBox)
-		{
-
-			for (int ycount = it.StaticArea.MostUpCheck; ycount <= it.StaticArea.MostDownCheck; ycount++)
 			{
-				for (int xcount = it.StaticArea.MostLeftCheck; xcount <= it.StaticArea.MostRightCheck; xcount++)
+				int x;
+				int y;
+			}; sCorseXY CorseXY = { (x + CollisionBox.CollisionBoxNotStatic.x) / 16,(y + CollisionBox.CollisionBoxNotStatic.y) / 16 };
+			for (int ycount = CollisionBox.StaticArea.MostUpCheck; ycount <= CollisionBox.StaticArea.MostDownCheck; ycount++)
+			{
+				for (int xcount = CollisionBox.StaticArea.MostLeftCheck; xcount <= CollisionBox.StaticArea.MostRightCheck; xcount++)
 				{
+					DrawRectangle(
+						(float)(CorseXY.x + xcount) * 16, 
+						(float)(CorseXY.y + ycount) * 16, 16, 16, GRAY);
+					DrawRectangle(
+						(float)x + CollisionBox.CollisionBoxNotStatic.x,
+						(float)y + CollisionBox.CollisionBoxNotStatic.y,
+						CollisionBox.CollisionBoxNotStatic.width,
+						CollisionBox.CollisionBoxNotStatic.height,
+						DARKBROWN);
 					if (CorseXY.y + ycount < 7 && CorseXY.y + ycount >= 0 && CorseXY.x + xcount < 7 && CorseXY.x + xcount >= 0)
 					{
 
@@ -70,43 +73,44 @@ public:
 						{
 						case 1:
 
-							if (CheckCollisionRecs(Rectangle{ (float)CorseXY.x * 16 + xcount * 16,(float)CorseXY.y * 16 + ycount * 16,16,16 }, Rectangle{ (float)x + it.CollisionBoxNotStatic.x,(float)y + it.CollisionBoxNotStatic.y,it.CollisionBoxNotStatic.width,it.CollisionBoxNotStatic.height }))
+							if (CheckCollisionRecs(Rectangle{ (float)(CorseXY.x + xcount) * 16,(float)(CorseXY.y + ycount) * 16,16,16 }, Rectangle{ (float)x + CollisionBox.CollisionBoxNotStatic.x,(float)y + CollisionBox.CollisionBoxNotStatic.y,CollisionBox.CollisionBoxNotStatic.width,CollisionBox.CollisionBoxNotStatic.height }))
 							{
 								return true;
 							}
 							break;
 
 						case 2:
-								if (IsFirstCollider)
-								{
-									if(y + it.CollisionBoxNotStatic.height > ((CorseXY.y + ycount +1)*16)-1)
+							if (CheckCollisionRecs(Rectangle{ (float)(CorseXY.x + xcount) * 16,(float)(CorseXY.y + ycount) * 16,16,16 }, Rectangle{ (float)x + CollisionBox.CollisionBoxNotStatic.x,(float)y + CollisionBox.CollisionBoxNotStatic.y,CollisionBox.CollisionBoxNotStatic.width,CollisionBox.CollisionBoxNotStatic.height }))
+							{
+								
+									if (((y + CollisionBox.CollisionBoxNotStatic.y + CollisionBox.CollisionBoxNotStatic.height > ((CorseXY.y + ycount + 1) * 16)) || (x + CollisionBox.CollisionBoxNotStatic.x + CollisionBox.CollisionBoxNotStatic.width > ((CorseXY.x + xcount + 1) * 16))))
 									{
+										if (Axis == eAxis::X && Tmp_x > 0)
+										{
+											Tmp_y = -1;
+										}
 										return true;
 									}
-									else if ((int)(x + it.CollisionBoxNotStatic.x + it.CollisionBoxNotStatic.width- ((CorseXY.x+1)*16) +y + it.CollisionBoxNotStatic.y + it.CollisionBoxNotStatic.height - ((CorseXY.y+1) * 16)) >=17)
+									else if
+										(
+											(int)(x + CollisionBox.CollisionBoxNotStatic.x + CollisionBox.CollisionBoxNotStatic.width - ((CorseXY.x + xcount) * 16)
+												+ y + CollisionBox.CollisionBoxNotStatic.y + CollisionBox.CollisionBoxNotStatic.height - ((CorseXY.y + ycount) * 16)) >= 18
+											)
 									{
+										DrawRectangle(0, 0, 8, 8, RED);
+
+										Tmp_y = -1;
+
+
 										return true;
 									}
-								}
-								else
-								{
-									if (y + it.CollisionBoxNotStatic.height > ((CorseXY.y + ycount + 1) * 16)-1)
-									{
-										return true;
-									}
-									else if ((int)(x + it.CollisionBoxNotStatic.x + it.CollisionBoxNotStatic.width - ((CorseXY.x+1) * 16) + y + it.CollisionBoxNotStatic.y + it.CollisionBoxNotStatic.height - ((CorseXY.y+1) * 16)) >= 17)
-									{
-										return true;
-									}
-								}
+							}
 							break;
 						default:
 							break;
 						}
 					}
 				}
-			}
-			IsFirstCollider = false;
 		}
 		return false;
 	}
@@ -115,47 +119,58 @@ public:
 	{
 		int Tmp_x = 0;
 		int Tmp_y = 0;
+		Fourcollision(x, y, Tmp_x, Tmp_y, eAxis::X, false);
 		//if (y < 102) { Tmp_y += 2; }
 		if (IsKeyDown(KEY_A) && x > -8){Tmp_x-=2;}
 		if (IsKeyDown(KEY_D) && x < 102){Tmp_x+=2;}
 		if (IsKeyDown(KEY_W) && y > -6){Tmp_y-=5;}
 		if (IsKeyDown(KEY_S) && y < 102){Tmp_y+=2;}
-		while (Tmp_x > 0)
-		{
-			if (!Fourcollision(x + 1, y, Tmp_x, Tmp_y, false)) { Tmp_x--; x++; }
-			else break;
-		}
-		while (Tmp_x < 0)
-		{
-			if (!Fourcollision(x - 1, y, Tmp_x, Tmp_y, false)) { Tmp_x++; x--; }
-			else break;
-		}
-		while (Tmp_y > 0)
-		{
-			if (!Fourcollision(x, y + 1, Tmp_x, Tmp_y,false))	{Tmp_y--; y++;}
-			else break;
-		}
-		while (Tmp_y < 0)
-		{
-			if (!Fourcollision(x, y - 1, Tmp_x, Tmp_y, false))	{Tmp_y++; y--;}
-			else break;
-		}
+			while (Tmp_x > 0)
+			{
+				if (!Fourcollision(x + 1, y, Tmp_x, Tmp_y, eAxis::X, false)) { Tmp_x--; x++; }
+				else break;
+			}
+			while (Tmp_x < 0)
+			{
+				if (!Fourcollision(x - 1, y, Tmp_x, Tmp_y, eAxis::X, false)) { Tmp_x++; x--; }
+				else break;
+			}
+			while (Tmp_y > 0)
+			{
+				if (!Fourcollision(x, y + 1, Tmp_x, Tmp_y, eAxis::Y, false)) { Tmp_y--; y++; }
+				else break;
+			}
+			while (Tmp_y < 0)
+			{
+				if (!Fourcollision(x, y - 1, Tmp_x, Tmp_y, eAxis::Y, false)) { Tmp_y++; y--; }
+				else break;
+			}
+
+			
 	}
 
 	void Draw()
 	{
+		//DrawLine(x+400	,y		,	x	- 400	, y			,GRAY);
+		//DrawLine(x		,y+400	,	x			,	y-400	,GRAY);
 		DrawText((std::to_string(x / 16) + "|" + std::to_string(y / 16)).c_str(), 0,0,20,WHITE);
-		for (Collider &it : CollisionBox)
-		{
-			DrawRectangle(x + it.CollisionBoxNotStatic.x, y + it.CollisionBoxNotStatic.y, it.CollisionBoxNotStatic.width, it.CollisionBoxNotStatic.height, Color{ 0,255,0,128 });
-			for (int ycount = it.StaticArea.MostUpCheck; ycount <= it.StaticArea.MostDownCheck; ++ycount)
+		bool isFirst = true;
+			DrawRectangle(x + CollisionBox.CollisionBoxNotStatic.x, y + CollisionBox.CollisionBoxNotStatic.y, CollisionBox.CollisionBoxNotStatic.width, CollisionBox.CollisionBoxNotStatic.height, Color{ 0,255,0,128 });
+			for (int ycount = CollisionBox.StaticArea.MostUpCheck; ycount <= CollisionBox.StaticArea.MostDownCheck; ++ycount)
 			{
-				for (int xcount = it.StaticArea.MostLeftCheck; xcount <= it.StaticArea.MostRightCheck; ++xcount)
+				for (int xcount = CollisionBox.StaticArea.MostLeftCheck; xcount <= CollisionBox.StaticArea.MostRightCheck; ++xcount)
 				{
-					DrawRectangleLines(x / 16 * 16 + xcount * 16, y / 16 * 16 + ycount * 16, 16, 16, BLUE);
+					if (isFirst == true)
+					{
+						//DrawRectangleLines(x / 16 * 16 + xcount * 16, y / 16 * 16 + ycount * 16, 16, 16, Color{ 0,0,255,200 });
+					}
+					else
+					{
+						//DrawRectangleLines(x / 16 * 16 + xcount * 16, y / 16 * 16 + ycount * 16, 16, 16, Color{0,255,255,200});
+					}
 				}
 			}
-		}
+			isFirst = false;
 		/*DrawRectangleLines(x / 16 * 16, y / 16 * 16, 16, 16, BLUE);
 		DrawRectangleLines(x / 16 * 16 + 16		, y / 16 * 16, 16, 16, BLUE);
 		DrawRectangleLines(x / 16 * 16 + 16		, y / 16 * 16 + 16, 16, 16, BLUE);
@@ -177,13 +192,13 @@ int main()
 	RenderTexture IngameRenderer = LoadRenderTexture(256,256);
 	while (! WindowShouldClose())
 	{
-		player.Update();
 		BeginDrawing();
 		ClearBackground(WHITE);
 		BeginTextureMode(IngameRenderer);
+		player.Update();
 		ClearBackground(BLACK);
 		player.Draw();
-		DrawFPS(0,32);
+		//DrawFPS(0,32);
 		for (uint8_t it_Y = 0; it_Y < 7; it_Y++)
 		{
 			for (uint8_t it_X = 0; it_X < 7; it_X++)
